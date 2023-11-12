@@ -298,19 +298,22 @@ else:
     st.warning("Ups! No databases were founded. Start uploading one")
     selected_db = None
 if selected_db is not None:
-    strategy_data = selected_db.get_strategy_data()
-    if strategy_data.strategy_summary is not None:
+    all_strategies_data = selected_db.get_strategy_data()
+    if all_strategies_data.strategy_summary is not None:
         st.divider()
         st.subheader("📝 Strategy summary")
         table_tab, chart_tab = st.tabs(["Table", "Chart"])
         with table_tab:
-            selection = show_strategy_summary(strategy_data.strategy_summary)
+            selection = show_strategy_summary(all_strategies_data.strategy_summary)
+            
             if selection is not None:
                 if len(selection) > 1:
                     st.warning("This version doesn't support multiple selections. Please try selecting only one.")
                     st.stop()
                 selected_exchange = selection["Exchange"].values[0]
                 selected_trading_pair = selection["Trading Pair"].values[0]
+                selected_config_path = selection["Strategy"].values[0]
+                strategy_data = selected_db.get_strategy_data(config_file_path=selected_config_path)
         with chart_tab:
             summary_chart = summary_chart(strategy_data.strategy_summary)
             st.plotly_chart(summary_chart, use_container_width=True)
